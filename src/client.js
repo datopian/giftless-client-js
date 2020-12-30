@@ -1,7 +1,12 @@
 import axios from 'axios'
 
 export default class Client {
-
+  /**
+   * Initialize client with the required parameters
+   * @param {*} lfs_server string
+   * @param {*} auth_token string
+   * @param {*} transfer_adapters string[]
+   */
   constructor(lfs_server, auth_token=null, transfer_adapters=['multipart-basic','basic']) {
     this._url = lfs_server.replace(/\/+$/g,'');
     this._auth_token = auth_token;
