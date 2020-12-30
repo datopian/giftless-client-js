@@ -1,10 +1,5 @@
 name: giftless-client-js
-on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
-
+on: [push]
 jobs:
   jest:
     runs-on: ubuntu-latest
