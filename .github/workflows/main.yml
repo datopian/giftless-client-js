@@ -1,0 +1,17 @@
+name: giftless-client-js
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  jest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install modules
+        run: yarn
+
+      - name: Run tests
+        run: yarn test
