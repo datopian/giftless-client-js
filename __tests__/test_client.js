@@ -1,6 +1,6 @@
 import axios from 'axios'
 import moxios from 'moxios'
-import Client from '../src/client';
+import { Client } from '../src';
 
 jest.setTimeout(60000);
 

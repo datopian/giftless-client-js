@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-export default class Client {
+class Client {
   /**
    * Initialize client with the required parameters
    * @param {*} lfs_server string
@@ -15,7 +15,7 @@ export default class Client {
   }
 
   async batch(prefix, operation, objects, ref=null, transfers=null) {
-    const url = this._url_for(null,prefix, 'objects', 'batch');
+    const url = this._urlFor(null,prefix, 'objects', 'batch');
     if (!transfers) {
         transfers = this.transfer_adapters;
     }
@@ -48,21 +48,23 @@ export default class Client {
     return response;
   }
 
-  _url_for(kwargs, ...args) {
+  _urlFor(kwargs, ...args) {
     const path = args.join('/');
     let url = `${this._url}/${path}`;
 
     if (kwargs) {
-      url = `${url}?${this._urlencode(kwargs)}`;
+      url = `${url}?${this._urlEncode(kwargs)}`;
     }
     return url;
   }
 
-  _urlencode = function(obj) {
+  _urlEncode(obj) {
     let str = [];
     for (let key in obj) {
-      str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+      str.push(encodeURIComponent(key) + "=" + encodeURIComponent(obj[key]));
     }
     return str.join("&");
   }
 }
+
+export {Client}
