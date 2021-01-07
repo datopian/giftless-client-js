@@ -14,15 +14,15 @@ class Client {
     this.LFS_MIME_TYPE = 'application/vnd.git-lfs+json'; 
   }
 
-  async batch(prefix, operation, objects, ref=null, transfers=null) {
+  async batch(prefix, operation, objects, ref=null, transfers) {
     const url = this._urlFor(null,prefix, 'objects', 'batch');
     if (!transfers) {
-        transfers = this.transfer_adapters;
+        transfers = this._transfer_adapters;
     }
 
-    const payload = {'transfer': transfers,
-                     'operations': operation,
-                     'object': objects
+    const payload = { transfers,
+                    operation,
+                     objects
                     };
     if (ref) payload['ref'] = 'ref';
 
@@ -34,6 +34,7 @@ class Client {
     if (this._auth_token) {
       headers['Authorization'] = `Bearer ${this._auth_token}`;
     }
+
     const response = await axios({
       method: 'post',
       url: url,
@@ -45,7 +46,7 @@ class Client {
       throw new Error(`Unexpected response from LFS server: ${response.status}`);
     }
 
-    return response;
+    return response.data;
   }
 
   _urlFor(kwargs, ...args) {
@@ -67,4 +68,4 @@ class Client {
   }
 }
 
-export {Client}
+export { Client }
