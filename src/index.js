@@ -1,39 +1,39 @@
 import axios from 'axios'
 
 class Client {
-  
+
   /**
    * Initialize client with the required parameters
-   * @param {String} lfs_server LFS Server url
-   * @param {String} auth_token token to access LFS Server
-   * @param {Array} transfer_adapters Transfer adapters method
+   * @param {String} lfsServer LFS Server url
+   * @param {String} authToken token to access LFS Server
+   * @param {Array} transferAdapters Transfer adapters method
    */
-  constructor(lfs_server, auth_token=null, transfer_adapters=['multipart-basic','basic']) {
-    this._url = lfs_server.replace(/\/+$/g,'');
-    this._auth_token = auth_token;
-    this._transfer_adapters = transfer_adapters;
-    this.LFS_MIME_TYPE = 'application/vnd.git-lfs+json'; 
+  constructor(lfsServer, authToken=null, transferAdapters=['multipart-basic','basic']) {
+    this.url = lfsServer.replace(/\/+$/g,'');
+    this.authToken = authToken;
+    this.transferAdapters = transferAdapters;
+    this.lfsMimeType = 'application/vnd.git-lfs+json'; 
   }
 
   async batch(prefix, operation, objects, ref=null, transfers) {
     const url = this._urlFor(null,prefix, 'objects', 'batch');
     if (!transfers) {
-        transfers = this._transfer_adapters;
+        transfers = this.transferAdapters;
     }
 
     const payload = { transfers,
-                    operation,
-                     objects
+                      operation,
+                      objects
                     };
     if (ref) payload['ref'] = 'ref';
 
     const headers = {
-      'Content-type': this.LFS_MIME_TYPE,
-      'Accept': this.LFS_MIME_TYPE
+      'Content-type': this.lfsMimeType,
+      'Accept': this.lfsMimeType
     };
 
-    if (this._auth_token) {
-      headers['Authorization'] = `Bearer ${this._auth_token}`;
+    if (this.authToken) {
+      headers['Authorization'] = `Bearer ${this.authToken}`;
     }
 
     const response = await axios({
@@ -52,7 +52,7 @@ class Client {
 
   _urlFor(kwargs, ...args) {
     const path = args.join('/');
-    let url = `${this._url}/${path}`;
+    let url = `${this.url}/${path}`;
 
     if (kwargs) {
       url = `${url}?${this._urlEncode(kwargs)}`;
