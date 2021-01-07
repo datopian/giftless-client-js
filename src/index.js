@@ -1,11 +1,12 @@
 import axios from 'axios'
 
 class Client {
+  
   /**
    * Initialize client with the required parameters
-   * @param {*} lfs_server string
-   * @param {*} auth_token string
-   * @param {*} transfer_adapters string[]
+   * @param {String} lfs_server LFS Server url
+   * @param {String} auth_token token to access LFS Server
+   * @param {Array} transfer_adapters Transfer adapters method
    */
   constructor(lfs_server, auth_token=null, transfer_adapters=['multipart-basic','basic']) {
     this._url = lfs_server.replace(/\/+$/g,'');
