@@ -23,11 +23,12 @@ This implementation of giftless-client exposes a main class called `Client` whic
 ### instantiating Client
 
 ```js
-import Client from "giftless-client";
-client = Client(
-  (lfs_server_url = "https://git-lfs.example.com"),
-  (auth_token = "somer4nd0mT0ken=="),
-  (transfer_adapters = ["basic"])
+import { Client } from "giftless-client";
+
+client = new Client(
+  "https://git-lfs.example.com",
+  "somer4nd0mT0ken==",
+  ["basic"]
 );
 ```
 
@@ -35,12 +36,15 @@ client = Client(
 
 ```js
 client.batch(
-  (prefix = "myorg/myrepo"),
-  (operation = "download"),
-  (objects = {
-    oid: "12345678",
-    size: 123,
-  })
+  "myorg/myrepo",
+  "download",
+  [
+    {
+      oid: "12345678",
+      size: 123,
+    }
+  ]
+  )
 );
 ```
 
