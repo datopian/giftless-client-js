@@ -95,13 +95,13 @@ class Client {
    * @param {String} onProgress 
    */
   async upload(file, organizationId, datasetId, onProgress) {
-    let prefix = `${organizationId}/${datasetId}`;
-    let ref = {name: 'refs/heads/master' };
-    let objects = [{
+    const prefix = `${organizationId}/${datasetId}`;
+    const ref = {name: 'refs/heads/master' };
+    const objects = [{
       oid: await getFileHash(file, 'sha256'),
       size: file.size,
     }]
-    let response = await this.batch(prefix, 'upload',objects,ref);
+    const response = await this.batch(prefix, 'upload',objects,ref);
 
     if (response.status !== 200) {
       throw `'batch' request failed: ${response.status}`;
