@@ -41,6 +41,6 @@ describe('Giftless client Test', () => {
   it('should obtain result from the mock api', async () => {
     const client = new Client('http://myserver.com');
     const response = await client.batch('myorg/myrepo', 'download', [file_object])
-    expect(response["transfer"]).toEqual('basic');
+    expect(response.data["transfer"]).toEqual('basic');
   });
 });

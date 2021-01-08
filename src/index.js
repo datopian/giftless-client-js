@@ -43,11 +43,16 @@ class Client {
       headers: headers
     });
 
-    if (response.status !== 200) {
-      throw new Error(`Unexpected response from LFS server: ${response.status}`);
+    const { status, data } = response
+    
+    if (status !== 200) {
+      throw new Error(`Unexpected response from LFS server: ${response.status} - ${response.statusText}`);
     }
 
-    return response.data;
+    return {
+      status,
+      data
+    };
   }
 
   _urlFor(kwargs, ...args) {
