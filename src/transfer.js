@@ -19,11 +19,11 @@ class GitLfsBasicTransfer {
    * @param {CallableFunction} onProgress
    */
   constructor(actions, file, onProgress) {
-    this._file = file;
-    this._onProgress = onProgress;
+    this.file = file;
+    this.onProgess = onProgress;
 
-    this._uploadAction = actions.upload || null;
-    this._verifyAction = actions.verify || null;
+    this.uploadAction = actions.upload || null;
+    this.verifyAction = actions.verify || null;
   }
 
   /**
@@ -34,14 +34,14 @@ class GitLfsBasicTransfer {
    */
   async upload() {
     let response;
-    if (this._uploadAction) {
+    if (this.uploadAction) {
       response = await this._doUpload();
       if (! (response.status >= 200 && response.status < 300)) {
         throw `'upload' action failed with HTTP ${response.status}`;
       }
     }
 
-    if (this._verifyAction) {
+    if (this.verifyAction) {
       response = await this._doVerify();
       if (response.status !== 200) {
         if (response.message) {
@@ -56,36 +56,39 @@ class GitLfsBasicTransfer {
   }
 
   async _doUpload() {
-    const { href, header } = this._uploadAction;
-    const body = this._file.descriptor;
+    const { href, header } = this.uploadAction;
+    const body = this.file.descriptor;
     const config = {
       headers: {
-        "Content-type": this._file.descriptor.type || 'application/octet-stream',
+        "Content-type": this.file.descriptor.type || 'application/octet-stream',
         ...header
       },
     }
 
-    if (this._onProgress) {
-      config.onUploadProgress = this._onProgress
+    if (this.onProgess) {
+      config.onUploadProgress = this.onProgess
     }
+    const { status, message} = await axios.put(href, body, config);
 
-    return axios.put(href, body, config);
+    return { status, message };
   }
 
   async _doVerify() {
     const body = JSON.stringify({
-      oid: await getFileHash(this._file, 'sha256'),
-      size: this._file.size,
+      oid: await getFileHash(this.file, 'sha256'),
+      size: this.file.size,
     })
     const config = {
       headers: {
         'Accept': 'application/vnd.git-lfs+json',
         'Content-Type': 'application/vnd.git-lfs+json',
-        ...this._verifyAction.header,
+        ...this.verifyAction.header,
       },
     }
 
-    return axios.post(this._verifyAction.href, body, config)
+    const { status, message} = await axios.post(this.verifyAction.href, body, config)
+
+    return { status, message }
   }
 }
 
@@ -107,12 +110,12 @@ class GitLfsMultipartTransfer {
    * @param {CallableFunction} onProgress
    */
   constructor(actions, file, onProgress) {
-    this._file = file;
-    this._externalProgressCallback = onProgress;
-    this._actions = actions;
+    this.file = file;
+    this.externalProgressCallback = onProgress;
+    this.actions = actions;
 
-    this._bytesTotal = 0;
-    this._bytesUploaded = 0;
+    this.bytesTotal = 0;
+    this.bytesUploaded = 0;
   }
 
   /**
@@ -123,34 +126,34 @@ class GitLfsMultipartTransfer {
   async upload() {
     let response;
 
-    if (this._actions.init) {
-      response = await this._doInit(this._actions.init);
+    if (this.actions.init) {
+      response = await this._doInit(this.actions.init);
       if (! (response.status >= 200 && response.status < 300)) {
         throw `'init' action failed with HTTP ${response.status}`;
       }
     }
 
-    const parts = this._actions.parts || [];
-    this._bytesTotal = this._file.size;
-    this._bytesUploaded = this._bytesTotal - this._getBytesToUpload(parts);
+    const parts = this.actions.parts || [];
+    this.bytesTotal = this.file.size;
+    this.bytesUploaded = this.bytesTotal - this._getBytesToUpload(parts);
     for (let i = 0; i < parts.length; i++) {
       console.log(`Uploading part ${i + 1}/${parts.length}`);
       response = await this._uploadPart(parts[i]);
       if (! (response.status >= 200 && response.status < 300)) {
         throw `'part upload failed for part ${i + 1}/${parts.length} with HTTP ${response.status}`;
       }
-      this._bytesUploaded += this._getBytesForPart(parts[i]);
+      this.bytesUploaded += this._getBytesForPart(parts[i]);
     }
 
-    if (this._actions.commit) {
-      response = await this._doCommit(this._actions.commit);
+    if (this.actions.commit) {
+      response = await this._doCommit(this.actions.commit);
       if (! (response.status >= 200 && response.status < 300)) {
         throw `'commit' action failed with HTTP ${response.status}`;
       }
     }
 
-    if (this._actions.verify) {
-      response = await this._doVerify(this._actions.verify);
+    if (this.actions.verify) {
+      response = await this._doVerify(this.actions.verify);
       if (response.status !== 200) {
         if (response.message) {
           throw response.message
@@ -174,8 +177,8 @@ class GitLfsMultipartTransfer {
       headers: initAction.header || {},
       data: initAction.body || null
     }
-
-    return axios.request(config);
+    const { status, message } = await axios.request(config);
+    return { status, message }
   }
 
   /**
@@ -205,7 +208,8 @@ class GitLfsMultipartTransfer {
       },
     }
 
-    return axios.request(config);
+    const { status, message } = await axios.request(config);
+    return { status, message }
   }
 
   /**
@@ -223,7 +227,8 @@ class GitLfsMultipartTransfer {
       data: commitAction.body || null
     }
 
-    return axios.request(config);
+    const { status, message } = await axios.request(config);
+    return { status, message }
   }
 
    /**
@@ -235,8 +240,8 @@ class GitLfsMultipartTransfer {
     */
   async _doVerify(verifyAction) {
     const body = JSON.stringify({
-      oid: await getFileHash(this._file, 'sha256'),
-      size: this._file.size,
+      oid: await getFileHash(this.file, 'sha256'),
+      size: this.file.size,
     })
     const config = {
       headers: {
@@ -245,8 +250,8 @@ class GitLfsMultipartTransfer {
         ...verifyAction.header,
       },
     }
-
-    return axios.post(verifyAction.href, body, config)
+    const { status, message } =  await axios.post(verifyAction.href, body, config);
+    return { status, message };
   }
 
   /**
@@ -259,9 +264,9 @@ class GitLfsMultipartTransfer {
    */
   async _readChunk(start, size) {
     if (size === null) {
-      return this._file.descriptor.slice(start);
+      return this.file.descriptor.slice(start);
     } else {
-      return this._file.descriptor.slice(start, start + size);
+      return this.file.descriptor.slice(start, start + size);
     }
   }
 
@@ -294,11 +299,11 @@ class GitLfsMultipartTransfer {
    * @private
    */
   _onUploadProgress(progressEvent) {
-    if (! this._externalProgressCallback) {
+    if (! this.externalProgressCallback) {
       return;
     }
-    let loaded = this._bytesUploaded;
-    let total = this._bytesTotal;
+    let loaded = this.bytesUploaded;
+    let total = this.bytesTotal;
     if (progressEvent.lengthComputable) {
       loaded += progressEvent.loaded;
     }
@@ -308,7 +313,7 @@ class GitLfsMultipartTransfer {
       loaded,
       total,
     });
-    this._externalProgressCallback(realProgress);
+    this.externalProgressCallback(realProgress);
   }
 
   /**
@@ -337,9 +342,9 @@ class GitLfsMultipartTransfer {
       return part.size;
     }
     if (part.pos) {
-      return this._file.size - part.pos
+      return this.file.size - part.pos
     }
-    return this._file.size;
+    return this.file.size;
   }
 }
 
