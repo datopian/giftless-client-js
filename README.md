@@ -25,11 +25,9 @@ This implementation of giftless-client exposes a main class called `Client` whic
 ```js
 import { Client } from "giftless-client";
 
-client = new Client(
-  "https://git-lfs.example.com",
-  "somer4nd0mT0ken==",
-  ["basic"]
-);
+client = new Client("https://git-lfs.example.com", "somer4nd0mT0ken==", [
+  "basic",
+]);
 ```
 
 ### Sending an LFS batch API request
@@ -46,6 +44,18 @@ client.batch(
   ]
   )
 );
+```
+
+### Upload to Gitless LFS Server
+
+Resources can be uploaded to lfs server using the client upload method `upload(file, organisationId, datasetId, onProgress)`
+
+```js
+import { open } from 'frictionlessjs`;
+
+const file = open('/path/resource.csv');
+await client.upload(file, 'my-org','dataset-name');
+
 ```
 
 ## License
