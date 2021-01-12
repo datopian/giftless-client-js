@@ -13,8 +13,6 @@ var _utils = require("./utils");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-_axios.default.defaults.adapter = require('axios/lib/adapters/http');
-
 class Client {
   /**
    * Initialize client with the required parameters
