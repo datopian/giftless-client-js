@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { GitLfsBasicTransfer, GitLfsMultipartTransfer} from './transfer';
 import { getFileHash } from './utils';
-axios.defaults.adapter = require('axios/lib/adapters/http');
+
 class Client {
 
   /**
